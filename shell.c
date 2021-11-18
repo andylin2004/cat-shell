@@ -4,7 +4,9 @@
 #include "parse.h"
 
 int main() {
-    char line[100];
-    printf("catsh $");
-    fgets(line, 100, stdin);
+    while (1){
+        char line[100];
+        printf("catsh $");
+        fgets(line, 100, stdin);
+    }
 }
