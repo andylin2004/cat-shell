@@ -28,3 +28,15 @@ int count_args(char *code) {
     }
     return num;
 }
+
+//handles pipes
+//TODO: work on this
+void parseWithPipes(){
+
+}
+
+//handles multiple commands seperated by a ;
+//TODO: work on this
+void parseWithSemicolons(){
+    
+}
