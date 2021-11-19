@@ -1,5 +1,6 @@
 all: shell.o parse.o
 	gcc -o shell shell.o parse.o
+	rm *.o
 
 shell.o: shell.c parse.h
 	gcc -c shell.c
