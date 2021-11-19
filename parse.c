@@ -7,11 +7,11 @@ char ** parse_args(char *code) {
     char *entry;
     char ** r = malloc(num * sizeof(char *));
     int i = 0;
-    while ((entry = strsep(&n, " "))) {
-        r[i] = malloc(SIZE);
-        strcpy(r[i], entry);
-        printf("%s\n",r[i]);
-        i++;
+    while (current = strsep(&code, " ")){
+        if (*current){
+            result[i] = current;
+            i++;
+        }
     }
     result[i] = NULL;
     return result;
