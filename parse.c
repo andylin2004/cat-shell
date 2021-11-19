@@ -4,14 +4,14 @@ char ** parse_args(char *code) {
     standardize(code);
     int num = count_args(code) + 1;
     char *n = code;
-    char ** result = malloc(num * sizeof(char *));
-    char *current;
+    char *entry;
+    char ** r = malloc(num * sizeof(char *));
     int i = 0;
-    while (current = strsep(&code, " ")){
-        if (*current){
-            result[i] = current;
-            i++;
-        }
+    while ((entry = strsep(&n, " "))) {
+        r[i] = malloc(SIZE);
+        strcpy(r[i], entry);
+        printf("%s\n",r[i]);
+        i++;
     }
     result[i] = NULL;
     return result;
