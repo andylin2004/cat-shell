@@ -1,13 +1,12 @@
 #include "parse.h"
 
 char ** parse_args(char *code) {
-    standardize(code);
     int num = count_args(code) + 1;
     char *n = code;
     char *current;
     char ** result = malloc(num * sizeof(char *));
     int i = 0;
-    while (current = strsep(&code, " ")){
+    while (current = strsep(&code, " \n")){
         if (*current){
             result[i] = current;
             i++;
@@ -28,9 +27,4 @@ int count_args(char *code) {
         n++;
     }
     return num;
-}
-
-//removes '\n' + starting, trailing, and consecutively repeated ' ' characters.
-void standardize(char *code) {
-    code[strcspn(code, "\n")] = 0;
 }
