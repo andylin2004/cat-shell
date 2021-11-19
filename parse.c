@@ -33,4 +33,5 @@ int count_args(char *code) {
 //removes '\n' + starting, trailing, and consecutively repeated ' ' characters.
 void standardize(char *code) {
     code[strcspn(code, "\n")];
+
 }
