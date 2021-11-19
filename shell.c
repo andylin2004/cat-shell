@@ -2,7 +2,7 @@
 
 int main() {
     while (1) {
-        printf("ACT$: ");
+        printf("catsh $");
         fflush(stdout);
         char command[100] = {0};
         read(STDIN_FILENO, command, 100);
