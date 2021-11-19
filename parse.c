@@ -2,10 +2,19 @@
 
 char ** parse_args(char *code) {
     standardize(code);
-    int num = count_args(code);
+    int num = count_args(code) + 1;
     char *n = code;
-    char *entry;
-    char ** r = malloc(num * sizeof(char *));
+    char ** result = malloc(num * sizeof(char *));
+    char *current;
+    int i = 0;
+    while (current = strsep(&code, " ")){
+        if (*current){
+            result[i] = current;
+            i++;
+        }
+    }
+    result[i] = NULL;
+    return result;
 }
 
 //counts number of arguments in a correctly formatted string (no starting, trailing, and consecutively repeated ' ' characters)
