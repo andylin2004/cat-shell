@@ -5,8 +5,10 @@
 
 int main() {
     while (1){
-        char line[100];
         printf("catsh $");
-        fgets(line, 100, stdin);
+        fflush(stdout);
+        char command[100] = {0};
+        read(STDIN_FILENO, command, 100);
+        parse_args(command);
     }
 }
