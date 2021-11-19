@@ -6,10 +6,12 @@ char ** parse_args(char *code) {
     char *n = code;
     char *entry;
     char ** r = malloc(num * sizeof(char *));
+    int i = 0;
     while ((entry = strsep(&n, " "))) {
         r[i] = malloc(SIZE);
         strcpy(r[i], entry);
-        i++
+        printf("%s\n",r[i]);
+        i++;
     }
     return r;
 }
