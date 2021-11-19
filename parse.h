@@ -7,4 +7,3 @@
 
 char ** parse_args(char *code);
 int count_args(char *code);
-void standardize(char *code);
