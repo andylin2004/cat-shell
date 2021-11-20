@@ -1,14 +1,21 @@
 #include "execute.h"
 
 void executeLine(char *input){
+    int numCommands = countDelimiters(input, ';');
     char **commands = parse_args(input, ';');
-    char *current = *commands;
     char **args;
-    while (current)
+    int i;
+    int status;
+    for (i = 0; i < numCommands; i++)
     {
-        printf("%s", current);
-        args = parse_args(current, ' ');
-        execvp(args[0], args);
-        current++;
+        args = parse_args(commands[i], ' ');
+        if (fork())
+        {
+            wait(&status);
+        }
+        else
+        {
+            execvp(args[0], args);
+        }
     }
 }
