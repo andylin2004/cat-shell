@@ -5,6 +5,5 @@
 #include <string.h>
 #define SIZE 1000
 
-char ** parse_args(char *code);
+char ** parse_args(char *code, char delim);
 int countDelimiters(char *code, char delim);
-void parseWithSemicolons(char *code);
