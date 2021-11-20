@@ -1,4 +1,4 @@
-#include "parse.h"
+#include "execute.h"
 
 int main() {
     // while (1) {
@@ -6,8 +6,9 @@ int main() {
         fflush(stdout);
         char command[1000] = {0};
         read(STDIN_FILENO, command, 100);
-        char **args = parse_args(command, ' ');
-        execvp(args[0], args);
+        // char **args = parse_args(command, ' ');
+        // execvp(args[0], args);
+        executeLine(command);
     // }
     return 0;
 }
