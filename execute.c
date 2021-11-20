@@ -6,6 +6,7 @@ void executeLine(char *input){
     char **args;
     while (current)
     {
+        printf("%s", current);
         args = parse_args(current, ' ');
         execvp(args[0], args);
         current++;

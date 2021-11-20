@@ -1,8 +1,8 @@
-all: shell.o parse.o execute.o
-	gcc -o shell shell.o parse.o execute.o
+all: shell.o execute.o parse.o
+	gcc -o shell shell.o execute.o parse.o
 	rm *.o
 
-shell.o: shell.c parse.h
+shell.o: shell.c execute.h
 	gcc -c shell.c
 
 execute.o: execute.c execute.h

@@ -1,7 +1,7 @@
 #include "execute.h"
 
 int main() {
-    // while (1) {
+    while (1) {
         printf("catsh $ ");
         fflush(stdout);
         char command[1000] = {0};
@@ -9,6 +9,6 @@ int main() {
         // char **args = parse_args(command, ' ');
         // execvp(args[0], args);
         executeLine(command);
-    // }
-    return 0;
+    }
+    // return 0;
 }
