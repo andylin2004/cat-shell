@@ -19,3 +19,15 @@ void executeLine(char *input){
         }
     }
 }
+
+void executePipedCommands(char *input){
+    char **commands = parse_args(input, '|');
+    char **args;
+    
+}
+
+void redirection(char *input){
+    char **commands = parse_args(input, '|');
+    char **args;
+
+}
