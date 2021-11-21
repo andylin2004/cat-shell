@@ -27,7 +27,7 @@ void executePipedCommands(char *input){
 }
 
 void redirection(char *input){
-    char **commands = parse_args(input, '|');
+    char **commands = parse_args(input, '>');
     char **args;
 
 }
