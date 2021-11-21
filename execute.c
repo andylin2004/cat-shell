@@ -15,6 +15,9 @@ void executeLine(char *input){
         }
         else
         {
+            if (strcmp(args[0], "exit") == 0){
+                kill(getppid(), SIGTERM);
+            }
             execvp(args[0], args);
         }
     }
