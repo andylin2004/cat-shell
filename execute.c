@@ -89,5 +89,10 @@ void redirection(char **input)
 
 void cd(char ** args){
     char dir[1000];
-    chdir(args[1]);
+    if (args[1]){
+        chdir(args[1]);
+    }else{
+        char *homedir = getenv("HOME");
+        chdir(homedir);
+    }
 }
