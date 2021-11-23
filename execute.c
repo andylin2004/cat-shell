@@ -23,7 +23,12 @@ void executeLine(char *input)
             {
                 kill(getppid(), SIGTERM); //ppid is the shell
             }
+            FILE *standardOutReal = dup(STDOUT_FILENO);
+            FILE *standardInReal = dup(STDIN_FILENO);
+            args = redirectionParseAndSetup(args);
             execvp(args[0], args);
+            dup2(standardInReal, STDIN_FILENO);
+            dup2(standardOutReal, STDOUT_FILENO);
         }
     }
 }
@@ -34,15 +39,18 @@ void executePipedCommands(char *input)
     char **args;
 }
 
-void redirection(char **input)
+char** redirectionParseAndSetup(char **input)
 {
     char *current = input;
     FILE *stdoutFile;
     FILE *stdinFile;
-    FILE *standardOutReal = dup(STDOUT_FILENO);
-    FILE *standardInReal = dup(STDIN_FILENO);
+    char **newInput = malloc(sizeof(input));
+    int i = 0;
+
+    printf("%s\n", input);
     while (current)
     {
+        // printf("%spp\n", current);
         if (current == '>')
         {
             if (current + 1 == '>')
@@ -76,15 +84,20 @@ void redirection(char **input)
                 stdinFile = open(current + 1, O_RDONLY, 0644);
             }
         }else{
-            
+            newInput[i] = current;
+            i++;
         }
+        current++;
     }
-    if (stdoutFile){
+    newInput[i] = NULL;
+    if (stdoutFile)
+    {
         dup2(stdoutFile, STDOUT_FILENO);
     }
     if (stdinFile){
         dup2(stdinFile, STDIN_FILENO);
     }
+    return newInput;
 }
 
 void cd(char ** args){
