@@ -35,11 +35,14 @@ void redirection(char **input){
     int numSpaces = parse_args(input, ' ');
     int inSlot = 0;
     int outSlot = 0;
+    int commandSlot = 1;
     char **filesIn = malloc(sizeof(char *) * numIn);
     char **filesOut = malloc(sizeof(char *) * numOut);
+    char **command = malloc(sizeof(input));
     char mode;
     int i;
     char *current;
+    command[0] = input[0];
     for (i = 1; i < numSpaces; i++)
     {
         current = input[i];
@@ -83,7 +86,8 @@ void redirection(char **input){
                 outSlot++;
                 mode = NULL;
             }else{
-                //treat as a normal command 
+                command[commandSlot] = current;
+                commandSlot++;
             }
         }
     }
