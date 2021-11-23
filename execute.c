@@ -29,13 +29,12 @@ void executePipedCommands(char *input){
     
 }
 
-void redirection(char *input){
+void redirection(char **input){
     int numIn = countDelimiters(input, '<');
     int numOut = countDelimiters(input, '>');
     int numSpaces = parse_args(input, ' ');
     int inSlot = 0;
     int outSlot = 0;
-    char **commands = parse_args(input, ' ');
     char **filesIn = malloc(sizeof(char *) * numIn);
     char **filesOut = malloc(sizeof(char *) * numOut);
     char mode;
@@ -43,13 +42,14 @@ void redirection(char *input){
     char *current;
     for (i = 1; i < numSpaces; i++)
     {
-        current = commands[i];
+        current = input[i];
         if (current == '>'){
+            // if (current + 1 == '>')
+            // {
+            // }
+            // else 
             if (mode != NULL){
                 break;
-            }
-            else if (current + 1 == '>')
-            {
             }
             else if (current + 1 != '\0')
             {
