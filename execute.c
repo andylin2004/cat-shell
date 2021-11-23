@@ -58,7 +58,6 @@ char** redirectionParseAndSetup(char **input)
 
     while (*current)
     {
-        printf("%c\n", *(*current + 1));
         if (**current == '>')
         {
             if (*(*current + 1) == '>')
@@ -74,7 +73,8 @@ char** redirectionParseAndSetup(char **input)
             }
             else if (*(*current + 1) == '\0')
             {
-                stdoutFile = open(*current++, O_WRONLY | O_CREAT, 0644);
+                current++;
+                stdoutFile = open(*current, O_WRONLY | O_CREAT, 0644);
             }
             else
             {
@@ -85,7 +85,8 @@ char** redirectionParseAndSetup(char **input)
         {
             if (*(*current + 1) == '\0')
             {
-                stdinFile = open(*current++, O_RDONLY, 0644);
+                current++;
+                stdinFile = open(*current, O_RDONLY, 0644);
             }
             else
             {
@@ -95,7 +96,7 @@ char** redirectionParseAndSetup(char **input)
             newInput[i] = *current;
             i++;
         }
-        *current++;
+        current++;
     }
     newInput[i] = NULL;
     if (stdoutFile)
