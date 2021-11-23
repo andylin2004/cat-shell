@@ -7,10 +7,12 @@ void executeLine(char *input)
     char **args;
     int i;
     int status;
+    int redirect;
     FILE *standardOutReal;
     FILE *standardInReal;
     for (i = 0; i < numCommands; i++)
     {
+        redirect = countDelimiters(commands[i], '<') + countDelimiters(commands[i], '>') - 2;
         args = parse_args(commands[i], ' ');
         if (fork())
         {
@@ -25,8 +27,6 @@ void executeLine(char *input)
             {
                 kill(getppid(), SIGTERM); //ppid is the shell
             }
-            int redirect = countDelimiters(commands[i], '<') + countDelimiters(commands[i], '>') - 2;
-            printf("%d\n", redirect);
             if (redirect)
             {
                 standardOutReal = dup(STDOUT_FILENO);
