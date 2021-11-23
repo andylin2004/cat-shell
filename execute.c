@@ -1,6 +1,7 @@
 #include "execute.h"
 
-void executeLine(char *input){
+void executeLine(char *input)
+{
     int numCommands = countDelimiters(input, ';');
     char **commands = parse_args(input, ';');
     char **args;
@@ -15,7 +16,8 @@ void executeLine(char *input){
         }
         else
         {
-            if (strcmp(args[0], "exit") == 0){
+            if (strcmp(args[0], "exit") == 0)
+            {
                 kill(getppid(), SIGTERM); //ppid is the shell
             }
             execvp(args[0], args);
@@ -23,71 +25,50 @@ void executeLine(char *input){
     }
 }
 
-void executePipedCommands(char *input){
+void executePipedCommands(char *input)
+{
     char **commands = parse_args(input, '|');
     char **args;
-    
 }
 
-void redirection(char **input){
-    int numIn = countDelimiters(input, '<');
-    int numOut = countDelimiters(input, '>');
-    int numSpaces = parse_args(input, ' ');
-    int inSlot = 0;
-    int outSlot = 0;
-    int commandSlot = 1;
-    char **filesIn = malloc(sizeof(char *) * numIn);
-    char **filesOut = malloc(sizeof(char *) * numOut);
-    char **command = malloc(sizeof(input));
-    char mode;
-    int i;
-    char *current;
-    command[0] = input[0];
-    for (i = 1; i < numSpaces; i++)
+void redirection(char **input)
+{
+    char *current = input;
+    FILE *stdoutFile;
+    FILE *stdinFile;
+    while (current)
     {
-        current = input[i];
-        if (current == '>'){
-            // if (current + 1 == '>')
-            // {
-            // }
-            // else 
-            if (mode != NULL){
-                break;
-            }
-            else if (current + 1 != '\0')
+        if (current == '>')
+        {
+            if (current + 1 == '>')
             {
-                filesOut[outSlot] = current;
-                outSlot++;
+                if (current + 1 == '\0')
+                {
+                    stdoutFile = open(current++, O_WRONLY | O_CREAT | O_APPEND, 0644);
+                }
+                else
+                {
+                    stdoutFile = open(current + 1, O_WRONLY | O_CREAT | O_APPEND, 0644);
+                }
+            }
+            else if (current + 1 == '\0')
+            {
+                stdoutFile = open(current++, O_WRONLY | O_CREAT, 0644);
             }
             else
             {
-                mode = '>';
+                stdoutFile = open(current + 1, O_WRONLY | O_CREAT, 0644);
             }
-        }else if (current == '<'){
-            if (mode != NULL){
-                break;
-            }
-            if (current+1 != '\0'){
-                filesIn[inSlot] = current;
-                inSlot++;
+        }
+        else if (current == '<')
+        {
+            if (current + 1 == '\0')
+            {
+                stdinFile = open(current++, O_RDONLY, 0644);
             }
             else
             {
-                mode = '<';
-            }
-        }else{
-            if (mode == '<'){
-                filesIn[inSlot] = current;
-                inSlot++;
-                mode = NULL;
-            }
-            else if (mode == '>'){
-                filesOut[outSlot] = current;
-                outSlot++;
-                mode = NULL;
-            }else{
-                command[commandSlot] = current;
-                commandSlot++;
+                stdinFile = open(current + 1, O_RDONLY, 0644);
             }
         }
     }
