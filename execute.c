@@ -7,6 +7,8 @@ void executeLine(char *input)
     char **args;
     int i;
     int status;
+    FILE *standardOutReal;
+    FILE *standardInReal;
     for (i = 0; i < numCommands; i++)
     {
         args = parse_args(commands[i], ' ');
@@ -23,12 +25,18 @@ void executeLine(char *input)
             {
                 kill(getppid(), SIGTERM); //ppid is the shell
             }
-            FILE *standardOutReal = dup(STDOUT_FILENO);
-            FILE *standardInReal = dup(STDIN_FILENO);
-            args = redirectionParseAndSetup(args);
+            int redirect = countDelimiters(input, '<') || countDelimiters(input, '>');
+            if (redirect)
+            {
+                standardOutReal = dup(STDOUT_FILENO);
+                standardInReal = dup(STDIN_FILENO);
+                args = redirectionParseAndSetup(args);
+            }
             execvp(args[0], args);
-            dup2(standardInReal, STDIN_FILENO);
-            dup2(standardOutReal, STDOUT_FILENO);
+            if (redirect){
+                dup2(standardInReal, STDIN_FILENO);
+                dup2(standardOutReal, STDOUT_FILENO);
+            }
         }
     }
 }
@@ -47,10 +55,9 @@ char** redirectionParseAndSetup(char **input)
     char **newInput = malloc(sizeof(input));
     int i = 0;
 
-    printf("%s\n", input);
-    while (current)
+    while (*current)
     {
-        // printf("%spp\n", current);
+        printf("%spp\n", current);
         if (current == '>')
         {
             if (current + 1 == '>')
