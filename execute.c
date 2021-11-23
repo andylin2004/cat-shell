@@ -25,7 +25,7 @@ void executeLine(char *input)
             {
                 kill(getppid(), SIGTERM); //ppid is the shell
             }
-            int redirect = countDelimiters(input, '<') || countDelimiters(input, '>');
+            int redirect = countDelimiters(commands[i], '<') + countDelimiters(commands[i], '>') - 2;
             if (redirect)
             {
                 standardOutReal = dup(STDOUT_FILENO);
