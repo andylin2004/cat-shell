@@ -30,7 +30,61 @@ void executePipedCommands(char *input){
 }
 
 void redirection(char *input){
-    char **commands = parse_args(input, '>');
-    char **args;
-
+    int numIn = countDelimiters(input, '<');
+    int numOut = countDelimiters(input, '>');
+    int numSpaces = parse_args(input, ' ');
+    int inSlot = 0;
+    int outSlot = 0;
+    char **commands = parse_args(input, ' ');
+    char **filesIn = malloc(sizeof(char *) * numIn);
+    char **filesOut = malloc(sizeof(char *) * numOut);
+    char mode;
+    int i;
+    char *current;
+    for (i = 1; i < numSpaces; i++)
+    {
+        current = commands[i];
+        if (current == '>'){
+            if (mode != NULL){
+                break;
+            }
+            else if (current + 1 == '>')
+            {
+            }
+            else if (current + 1 != '\0')
+            {
+                filesOut[outSlot] = current;
+                outSlot++;
+            }
+            else
+            {
+                mode = '>';
+            }
+        }else if (current == '<'){
+            if (mode != NULL){
+                break;
+            }
+            if (current+1 != '\0'){
+                filesIn[inSlot] = current;
+                inSlot++;
+            }
+            else
+            {
+                mode = '<';
+            }
+        }else{
+            if (mode == '<'){
+                filesIn[inSlot] = current;
+                inSlot++;
+                mode = NULL;
+            }
+            else if (mode == '>'){
+                filesOut[outSlot] = current;
+                outSlot++;
+                mode = NULL;
+            }else{
+                //treat as a normal command 
+            }
+        }
+    }
 }
