@@ -10,16 +10,16 @@ void executeLine(char *input)
     for (i = 0; i < numCommands; i++)
     {
         args = parse_args(commands[i], ' ');
-        if (strcmp(args[0], "cd") == 0){
-            cd(args);
-        }
-        else if (fork())
+        if (fork())
         {
             wait(&status);
         }
         else
         {
-            if (strcmp(args[0], "exit") == 0)
+            if (strcmp(args[0], "cd") == 0){
+                cd(args);
+            }
+            else if (strcmp(args[0], "exit") == 0)
             {
                 kill(getppid(), SIGTERM); //ppid is the shell
             }
