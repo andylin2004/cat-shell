@@ -10,7 +10,10 @@ void executeLine(char *input)
     for (i = 0; i < numCommands; i++)
     {
         args = parse_args(commands[i], ' ');
-        if (fork())
+        if (strcmp(args[0], "cd") == 0){
+            cd(args);
+        }
+        else if (fork())
         {
             wait(&status);
         }
@@ -82,4 +85,9 @@ void redirection(char **input)
     if (stdinFile){
         dup2(stdinFile, STDIN_FILENO);
     }
+}
+
+void cd(char ** args){
+    char dir[1000];
+    chdir(args[1]);
 }
