@@ -36,6 +36,8 @@ void redirection(char **input)
     char *current = input;
     FILE *stdoutFile;
     FILE *stdinFile;
+    FILE *standardOutReal = dup(STDOUT_FILENO);
+    FILE *standardInReal = dup(STDIN_FILENO);
     while (current)
     {
         if (current == '>')
@@ -70,6 +72,14 @@ void redirection(char **input)
             {
                 stdinFile = open(current + 1, O_RDONLY, 0644);
             }
+        }else{
+            
         }
+    }
+    if (stdoutFile){
+        dup2(stdoutFile, STDOUT_FILENO);
+    }
+    if (stdinFile){
+        dup2(stdinFile, STDIN_FILENO);
     }
 }
