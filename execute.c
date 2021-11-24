@@ -8,7 +8,6 @@ void executeCommand(char **commands);
 void executeLine(char *input)
 {
     input = standardizeString(input);
-    printf("%s\n", input);
     int numCommands = countDelimiters(input, ';');
     char **commands = parse_args(input, ';');
     char **args;
@@ -76,7 +75,7 @@ char** redirectionParseAndSetup(char **input)
     {
         if (**current == '>')
         {
-            if (**current + 1 == '>')
+            if (*(*current + 1) == '>')
             {
                 current++;
                 stdoutFile = open(*current, O_WRONLY | O_CREAT | O_APPEND, 0777);
