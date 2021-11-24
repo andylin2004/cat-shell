@@ -76,3 +76,12 @@ char *standardizeString(char *oldString){
     }
     return newString;
 }
+
+int lengthOfArray(char **array){
+    int total = 0;
+    while(*array){
+        total++;
+        array++;
+    }
+    return total;
+}
