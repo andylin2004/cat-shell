@@ -1,5 +1,8 @@
 #include "execute.h"
 
+void cd(char ** args);
+char **redirectionParseAndSetup(char **input);
+
 void executeLine(char *input)
 {
     int numCommands = countDelimiters(input, ';');
