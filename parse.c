@@ -41,3 +41,38 @@ int arrayOfStringsLength(char **array){
     }
     return total;
 }
+
+char *standardizeString(char *oldString){
+    int newStringLength = (countDelimiters(oldString, '>') - 1)*2 + (countDelimiters(oldString, '<')- 1)*2 + (countDelimiters(oldString, '|')-1)*2 + strlen(oldString);
+    char *newString = malloc(newStringLength);
+    char *current = oldString;
+    int indice = 0;
+    while (*current)
+    {
+        if (*current == '>' && *(current + 1) == '>'){
+            newString[indice] = ' ';
+            indice++;
+            newString[indice] = *current;
+            indice++;
+            newString[indice] = *current;
+            indice++;
+            newString[indice] = ' ';
+            current++;
+        }
+        else if (*current == '>' || *current == '<' || *current == '|')
+        {
+            newString[indice] = ' ';
+            indice++;
+            newString[indice] = *current;
+            indice++;
+            newString[indice] = ' ';
+        }
+        else
+        {
+            newString[indice] = *current;
+        }
+        indice++;
+        current++;
+    }
+    return newString;
+}

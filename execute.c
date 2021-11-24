@@ -7,6 +7,8 @@ void executeCommand(char **commands);
 
 void executeLine(char *input)
 {
+    input = standardizeString(input);
+    printf("%s\n", input);
     int numCommands = countDelimiters(input, ';');
     char **commands = parse_args(input, ';');
     char **args;
@@ -38,8 +40,10 @@ void executeLine(char *input)
                 standardInReal = dup(STDIN_FILENO);
                 args = redirectionParseAndSetup(args);
             }
-            executeCommand(args);
-            if (redirect){
+            // executeCommand(args);
+            execvp(args[0], args);
+            if (redirect)
+            {
                 dup2(standardInReal, STDIN_FILENO);
                 dup2(standardOutReal, STDOUT_FILENO);
                 close(standardInReal);
@@ -72,39 +76,21 @@ char** redirectionParseAndSetup(char **input)
     {
         if (**current == '>')
         {
-            if (*(*current + 1) == '>')
+            if (**current + 1 == '>')
             {
-                if (*(*current + 2) == '\0')
-                {
-                    current += 1;
-                    stdoutFile = open(*current, O_WRONLY | O_CREAT | O_APPEND, 0777);
-                }
-                else
-                {
-                    stdoutFile = open(*current + 2, O_WRONLY | O_CREAT | O_APPEND, 0777);
-                }
+                current++;
+                stdoutFile = open(*current, O_WRONLY | O_CREAT | O_APPEND, 0777);
             }
-            else if (*(*current + 1) == '\0')
+            else
             {
                 current++;
                 stdoutFile = open(*current, O_WRONLY | O_CREAT | O_TRUNC, 0777);
             }
-            else
-            {
-                stdoutFile = open(*current + 1, O_WRONLY | O_CREAT | O_TRUNC, 0777);
-            }
         }
         else if (**current == '<')
         {
-            if (*(*current + 1) == '\0')
-            {
-                current++;
-                stdinFile = open(*current, O_RDONLY, 0777);
-            }
-            else
-            {
-                stdinFile = open(*current + 1, O_RDONLY, 0777);
-            }
+            current++;
+            stdinFile = open(*current, O_RDONLY, 0777);
         }else{
             newInput[i] = *current;
             i++;
