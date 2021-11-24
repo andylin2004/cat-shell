@@ -2,6 +2,8 @@
 
 void cd(char ** args);
 char **redirectionParseAndSetup(char **input);
+void popenTest();
+void executeCommand(char **commands);
 
 void executeLine(char *input)
 {
@@ -36,7 +38,7 @@ void executeLine(char *input)
                 standardInReal = dup(STDIN_FILENO);
                 args = redirectionParseAndSetup(args);
             }
-            execvp(args[0], args);
+            executeCommand(args);
             if (redirect){
                 dup2(standardInReal, STDIN_FILENO);
                 dup2(standardOutReal, STDOUT_FILENO);
@@ -47,10 +49,15 @@ void executeLine(char *input)
     }
 }
 
-void executePipedCommands(char *input)
+void executeCommand(char **commands) //this will deal with pipings
 {
-    char **commands = parse_args(input, '|');
-    char **args;
+    char *commandLine = malloc(arrayOfStringsLength(commands));
+    char **current = commands;
+    while (*current){
+        strcat(commandLine, *current);
+        current++;
+    }
+    popen(commandLine, "w");
 }
 
 char** redirectionParseAndSetup(char **input)

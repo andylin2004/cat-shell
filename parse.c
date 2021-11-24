@@ -30,3 +30,14 @@ int countDelimiters(char *code, char delim) {
     }
     return num;
 }
+
+int arrayOfStringsLength(char **array){
+    char **current = array;
+    int total = 0;
+    while (*current)
+    {
+        total += strlen(*current);
+        current++;
+    }
+    return total;
+}

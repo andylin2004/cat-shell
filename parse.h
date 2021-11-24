@@ -7,3 +7,4 @@
 
 char ** parse_args(char *code, char delim);
 int countDelimiters(char *code, char delim);
+int arrayOfStringsLength(char **array);
