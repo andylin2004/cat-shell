@@ -8,8 +8,8 @@ void executeLine(char *input)
     int i;
     int status;
     int redirect;
-    FILE *standardOutReal;
-    FILE *standardInReal;
+    int standardOutReal;
+    int standardInReal;
     for (i = 0; i < numCommands; i++)
     {
         redirect = countDelimiters(commands[i], '<') + countDelimiters(commands[i], '>') - 2;
@@ -31,12 +31,14 @@ void executeLine(char *input)
             {
                 standardOutReal = dup(STDOUT_FILENO);
                 standardInReal = dup(STDIN_FILENO);
-                args = *redirectionParseAndSetup(args);
+                args = redirectionParseAndSetup(args);
             }
             execvp(args[0], args);
             if (redirect){
                 dup2(standardInReal, STDIN_FILENO);
                 dup2(standardOutReal, STDOUT_FILENO);
+                close(standardInReal);
+                close(standardOutReal);
             }
         }
     }
@@ -51,8 +53,8 @@ void executePipedCommands(char *input)
 char** redirectionParseAndSetup(char **input)
 {
     char **current = input;
-    FILE *stdoutFile;
-    FILE *stdinFile;
+    int stdoutFile;
+    int stdinFile;
     char **newInput = malloc(sizeof(input));
     int i = 0;
 
@@ -62,23 +64,24 @@ char** redirectionParseAndSetup(char **input)
         {
             if (*(*current + 1) == '>')
             {
-                if (*(*current + 1) == '\0')
+                if (*(*current + 2) == '\0')
                 {
-                    stdoutFile = open(*current++, O_WRONLY | O_CREAT | O_APPEND, 0644);
+                    current += 1;
+                    stdoutFile = open(*current, O_WRONLY | O_CREAT | O_APPEND, 0777);
                 }
                 else
                 {
-                    stdoutFile = open(*current + 1, O_WRONLY | O_CREAT | O_APPEND, 0644);
+                    stdoutFile = open(*current + 2, O_WRONLY | O_CREAT | O_APPEND, 0777);
                 }
             }
             else if (*(*current + 1) == '\0')
             {
                 current++;
-                stdoutFile = open(*current, O_WRONLY | O_CREAT, 0644);
+                stdoutFile = open(*current, O_WRONLY | O_CREAT | O_TRUNC, 0777);
             }
             else
             {
-                stdoutFile = open(*current + 1, O_WRONLY | O_CREAT, 0644);
+                stdoutFile = open(*current + 1, O_WRONLY | O_CREAT | O_TRUNC, 0777);
             }
         }
         else if (**current == '<')
@@ -86,11 +89,11 @@ char** redirectionParseAndSetup(char **input)
             if (*(*current + 1) == '\0')
             {
                 current++;
-                stdinFile = open(*current, O_RDONLY, 0644);
+                stdinFile = open(*current, O_RDONLY, 0777);
             }
             else
             {
-                stdinFile = open(*current + 1, O_RDONLY, 0644);
+                stdinFile = open(*current + 1, O_RDONLY, 0777);
             }
         }else{
             newInput[i] = *current;
@@ -102,9 +105,11 @@ char** redirectionParseAndSetup(char **input)
     if (stdoutFile)
     {
         dup2(stdoutFile, STDOUT_FILENO);
+        close(stdoutFile);
     }
     if (stdinFile){
         dup2(stdinFile, STDIN_FILENO);
+        close(stdinFile);
     }
     return newInput;
 }
