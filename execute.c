@@ -45,7 +45,6 @@ void executeLine(char *input)
             }
         }
         executeCommand(args, pipes);
-        wait(&status);
         if (redirect || pipes)
         {
             dup2(standardInReal, STDIN_FILENO);
@@ -90,22 +89,17 @@ void executeCommandFork(char **commands, int start, int end)
 {
     char **args;
     int i;
-    for (i = 0; i < lengthOfArray(commands); i++){
-        printf("%s\n", commands[i]);
-    }
     for (; end < lengthOfArray(commands) && *commands[end] != '|'; end++){
-        printf("%s is sus\n", commands[end]);
+        printf("%s\n", commands[end]);
     }
     int newStart = end + 1;
+    end--;
     args = malloc(end - start + 1);
     args[end - start] = NULL;
-    end--;
-    printf("address dn %d\n", &args[end - start]);
     for (; end >= start; end--)
     {
-        printf("%s from end\n", commands[end]);
+        printf("%s\n", commands[end]);
         args[end - start] = commands[end];
-        printf("address %d\n", &args[end - start]);
     }
     if (fork() == 0)
     {
@@ -113,11 +107,18 @@ void executeCommandFork(char **commands, int start, int end)
         if (pipeNum + 1 < pipes * 2)
         {
             dup2(pipefd[pipeNum + 1], STDOUT_FILENO);
+        }else if (standardOutTemp)
+        {
+            dup2(standardOutTemp, STDOUT_FILENO);
         }
 
         if (pipeNum - 2 >= 0)
         {
             dup2(pipefd[pipeNum - 2], STDIN_FILENO);
+        }else if (standardInTemp)
+        {
+            printf("head");
+            dup2(standardInTemp, STDIN_FILENO);
         }
 
         for (i = 0; i < pipes * 2; i++)
@@ -126,7 +127,6 @@ void executeCommandFork(char **commands, int start, int end)
         }
 
         execvp(args[0], args);
-        free(args);
     }
     else
     {
@@ -164,16 +164,14 @@ char **redirectionParseAndSetup(char **input)
             current++;
             standardInTemp = open(*current, O_RDONLY, 0777);
         }
-        else{
+        else
+        {
             newInput[i] = *current;
-            printf("%d\n", newInput[i]);
-            printf("%s\n", newInput[i]);
             i++;
         }
         current++;
     }
     newInput[i] = NULL;
-
     if (standardOutTemp)
     {
         dup2(standardOutTemp, STDOUT_FILENO);
