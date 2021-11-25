@@ -7,6 +7,8 @@ void executeCommand(char **commands, int pipes);
 void executeCommandFork(char **commands, int start, int end);
 int standardOutReal;
 int standardInReal;
+int standardOutTemp;
+int standardInTemp;
 int status;
 int *pipefd;
 int pipeNum = 0;
@@ -25,34 +27,35 @@ void executeLine(char *input)
         redirect = countDelimiters(commands[i], '<') + countDelimiters(commands[i], '>') - 2;
         pipes = countDelimiters(commands[i], '|') - 1;
         args = parse_args(commands[i], ' ');
-        if (fork())
+        if (strcmp(args[0], "cd") == 0)
         {
-            wait(&status);
+            cd(args);
         }
-        else
+        else if (strcmp(args[0], "exit") == 0)
         {
-            if (strcmp(args[0], "cd") == 0)
-            {
-                cd(args);
-            }
-            else if (strcmp(args[0], "exit") == 0)
-            {
-                kill(getppid(), SIGTERM); //ppid is the shell
-            }
+            kill(getppid(), SIGTERM); //ppid is the shell
+        }
+        if (redirect || pipes)
+        {
+            standardOutReal = dup(STDOUT_FILENO);
+            standardInReal = dup(STDIN_FILENO);
             if (redirect)
             {
-                standardOutReal = dup(STDOUT_FILENO);
-                standardInReal = dup(STDIN_FILENO);
                 args = redirectionParseAndSetup(args);
             }
-            executeCommand(args, pipes);
-            // execvp(args[0], args);
-            if (redirect || pipes)
-            {
-                dup2(standardInReal, STDIN_FILENO);
-                dup2(standardOutReal, STDOUT_FILENO);
-                close(standardInReal);
-                close(standardOutReal);
+        }
+        executeCommand(args, pipes);
+        if (redirect || pipes)
+        {
+            dup2(standardInReal, STDIN_FILENO);
+            dup2(standardOutReal, STDOUT_FILENO);
+            close(standardInReal);
+            close(standardOutReal);
+            if (standardInTemp){
+                close(standardInTemp);
+            }
+            if (standardOutTemp){
+                close(standardOutTemp);
             }
         }
     }
@@ -63,54 +66,73 @@ void executeCommand(char **commands, int pipes) //this will deal with pipings
     char **args;
     pipefd = malloc(sizeof(int) * pipes);
     int i;
-    for (i = 0; i < pipes; i++){
+    for (i = 0; i < pipes; i++)
+    {
         pipe(pipefd + i * 2);
     }
 
     executeCommandFork(commands, 0, 0);
 
-    for (i = 0; i < pipes; i++){
+    for (i = 0; i < pipes; i++)
+    {
         wait(&status);
     }
-    for (i = 0; i < pipes * 2; i++){
-            close(pipefd[i]);
-        }
+    for (i = 0; i < pipes * 2; i++)
+    {
+        close(pipefd[i]);
+    }
 
     pipeNum = 0;
 }
 
-void executeCommandFork(char **commands, int start, int end){
+void executeCommandFork(char **commands, int start, int end)
+{
     char **args;
     int i;
-    for (; end < lengthOfArray(commands) && *commands[end] != '|'; end++);
+    for (; end < lengthOfArray(commands) && *commands[end] != '|'; end++){
+        printf("%s\n", commands[end]);
+    }
     int newStart = end + 1;
     end--;
     args = malloc(end - start + 1);
     args[end - start] = NULL;
     for (; end >= start; end--)
     {
+        printf("%s\n", commands[end]);
         args[end - start] = commands[end];
     }
-    dup2(standardOutReal, STDOUT_FILENO);
     if (fork() == 0)
     {
         printf("%d\n", pipeNum);
         if (pipeNum + 1 < pipes * 2)
         {
             dup2(pipefd[pipeNum + 1], STDOUT_FILENO);
+        }else if (standardOutTemp)
+        {
+            dup2(standardOutTemp, STDOUT_FILENO);
         }
 
-        if (pipeNum - 2 >= 0){
+        if (pipeNum - 2 >= 0)
+        {
             dup2(pipefd[pipeNum - 2], STDIN_FILENO);
+        }else if (standardInTemp)
+        {
+            printf("head");
+            dup2(standardInTemp, STDIN_FILENO);
         }
-        
-        for (i = 0; i < pipes * 2; i++){
+
+        for (i = 0; i < pipes * 2; i++)
+        {
             close(pipefd[i]);
         }
+
         execvp(args[0], args);
-    }else{
+    }
+    else
+    {
         pipeNum += 2;
-        if (pipeNum <= pipes * 2){
+        if (pipeNum <= pipes * 2)
+        {
             executeCommandFork(commands, newStart, newStart);
         }
     }
@@ -119,8 +141,6 @@ void executeCommandFork(char **commands, int start, int end){
 char **redirectionParseAndSetup(char **input)
 {
     char **current = input;
-    int stdoutFile;
-    int stdinFile;
     char **newInput = malloc(sizeof(input));
     int i = 0;
 
@@ -131,18 +151,18 @@ char **redirectionParseAndSetup(char **input)
             if (*(*current + 1) == '>')
             {
                 current++;
-                stdoutFile = open(*current, O_WRONLY | O_CREAT | O_APPEND, 0777);
+                standardOutTemp = open(*current, O_WRONLY | O_CREAT | O_APPEND, 0777);
             }
             else
             {
                 current++;
-                stdoutFile = open(*current, O_WRONLY | O_CREAT | O_TRUNC, 0777);
+                standardOutTemp = open(*current, O_WRONLY | O_CREAT | O_TRUNC, 0777);
             }
         }
         else if (**current == '<')
         {
             current++;
-            stdinFile = open(*current, O_RDONLY, 0777);
+            standardInTemp = open(*current, O_RDONLY, 0777);
         }
         else
         {
@@ -152,15 +172,13 @@ char **redirectionParseAndSetup(char **input)
         current++;
     }
     newInput[i] = NULL;
-    if (stdoutFile)
+    if (standardOutTemp)
     {
-        dup2(stdoutFile, STDOUT_FILENO);
-        close(stdoutFile);
+        dup2(standardOutTemp, STDOUT_FILENO);
     }
-    if (stdinFile)
+    if (standardInTemp)
     {
-        dup2(stdinFile, STDIN_FILENO);
-        close(stdinFile);
+        dup2(standardInTemp, STDIN_FILENO);
     }
     return newInput;
 }
