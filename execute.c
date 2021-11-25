@@ -4,14 +4,13 @@ void cd(char **args);
 char **redirectionParseAndSetup(char **input);
 void popenTest();
 void executeCommand(char **commands, int pipes);
-void executeCommandFork(char **commands, int start, int end);
+void executeCommandFork(char **commands, int start, int end, int pipeNum);
 int standardOutReal;
 int standardInReal;
 int standardOutTemp;
 int standardInTemp;
 int status;
 int *pipefd;
-int pipeNum = 0;
 int pipes;
 
 void executeLine(char *input)
@@ -45,16 +44,26 @@ void executeLine(char *input)
             }
         }
         executeCommand(args, pipes);
+        wait(&status);
         if (redirect || pipes)
         {
+            if (pipes)
+            {
+                for (i = 0; i < pipes * 2; i++)
+                {
+                    close(pipefd[i]);
+                }
+            }
             dup2(standardInReal, STDIN_FILENO);
             dup2(standardOutReal, STDOUT_FILENO);
             close(standardInReal);
             close(standardOutReal);
-            if (standardInTemp){
+            if (standardInTemp)
+            {
                 close(standardInTemp);
             }
-            if (standardOutTemp){
+            if (standardOutTemp)
+            {
                 close(standardOutTemp);
             }
         }
@@ -71,25 +80,20 @@ void executeCommand(char **commands, int pipes) //this will deal with pipings
         pipe(pipefd + i * 2);
     }
 
-    executeCommandFork(commands, 0, 0);
+    executeCommandFork(commands, 0, 0, 0);
 
     for (i = 0; i < pipes; i++)
     {
         wait(&status);
     }
-    for (i = 0; i < pipes * 2; i++)
-    {
-        close(pipefd[i]);
-    }
-
-    pipeNum = 0;
 }
 
-void executeCommandFork(char **commands, int start, int end)
+void executeCommandFork(char **commands, int start, int end, int pipeNum)
 {
     char **args;
     int i;
-    for (; end < lengthOfArray(commands) && *commands[end] != '|'; end++){
+    for (; end < lengthOfArray(commands) && *commands[end] != '|'; end++)
+    {
         printf("%s\n", commands[end]);
     }
     int newStart = end + 1;
@@ -107,7 +111,8 @@ void executeCommandFork(char **commands, int start, int end)
         if (pipeNum + 1 < pipes * 2)
         {
             dup2(pipefd[pipeNum + 1], STDOUT_FILENO);
-        }else if (standardOutTemp)
+        }
+        else if (standardOutTemp)
         {
             dup2(standardOutTemp, STDOUT_FILENO);
         }
@@ -115,7 +120,8 @@ void executeCommandFork(char **commands, int start, int end)
         if (pipeNum - 2 >= 0)
         {
             dup2(pipefd[pipeNum - 2], STDIN_FILENO);
-        }else if (standardInTemp)
+        }
+        else if (standardInTemp)
         {
             printf("head");
             dup2(standardInTemp, STDIN_FILENO);
@@ -133,7 +139,7 @@ void executeCommandFork(char **commands, int start, int end)
         pipeNum += 2;
         if (pipeNum <= pipes * 2)
         {
-            executeCommandFork(commands, newStart, newStart);
+            executeCommandFork(commands, newStart, newStart, pipeNum);
         }
     }
 }
