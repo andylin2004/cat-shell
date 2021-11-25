@@ -44,6 +44,7 @@ void executeLine(char *input)
             }
         }
         executeCommand(args, pipes);
+        wait(&status);
         if (redirect || pipes)
         {
             if (pipes)
@@ -81,7 +82,7 @@ void executeCommand(char **commands, int pipes) //this will deal with pipings
 
     executeCommandFork(commands, 0, 0, 0);
 
-    for (i = 0; i < pipes + 1; i++)
+    for (i = 0; i < pipes; i++)
     {
         wait(&status);
     }
