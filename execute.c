@@ -47,7 +47,7 @@ void executeLine(char *input)
             }
             executeCommand(args, pipes);
             // execvp(args[0], args);
-            if (redirect)
+            if (redirect || pipes)
             {
                 dup2(standardInReal, STDIN_FILENO);
                 dup2(standardOutReal, STDOUT_FILENO);
@@ -64,23 +64,25 @@ void executeCommand(char **commands, int pipes) //this will deal with pipings
     pipefd = malloc(sizeof(int) * pipes);
     int i;
     for (i = 0; i < pipes; i++){
-        pipe(pipefd + pipes * 2);
+        pipe(pipefd + i * 2);
     }
 
     executeCommandFork(commands, 0, 0);
 
-    for (i = 0; i < pipes+1; i++){
+    for (i = 0; i < pipes; i++){
         wait(&status);
     }
+    for (i = 0; i < pipes * 2; i++){
+            close(pipefd[i]);
+        }
+
+    pipeNum = 0;
 }
 
 void executeCommandFork(char **commands, int start, int end){
     char **args;
     int i;
-    for (; end < lengthOfArray(commands) && *commands[end] != '|'; end++)
-    {
-        printf("%s\n", commands[end]);
-    }
+    for (; end < lengthOfArray(commands) && *commands[end] != '|'; end++);
     int newStart = end + 1;
     end--;
     args = malloc(end - start + 1);
@@ -92,16 +94,19 @@ void executeCommandFork(char **commands, int start, int end){
     dup2(standardOutReal, STDOUT_FILENO);
     if (fork() == 0)
     {
-        if (pipeNum + 1 < pipes * 2){
+        printf("%d\n", pipeNum);
+        if (pipeNum + 1 < pipes * 2)
+        {
             dup2(pipefd[pipeNum + 1], STDOUT_FILENO);
         }
 
         if (pipeNum - 2 >= 0){
             dup2(pipefd[pipeNum - 2], STDIN_FILENO);
         }
-        // for (i = 0; i < pipes * 2; i++){
-        //     close(pipefd[i]);
-        // }
+        
+        for (i = 0; i < pipes * 2; i++){
+            close(pipefd[i]);
+        }
         execvp(args[0], args);
     }else{
         pipeNum += 2;
