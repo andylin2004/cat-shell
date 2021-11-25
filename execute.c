@@ -1,9 +1,13 @@
 #include "execute.h"
 
-void cd(char ** args);
+void cd(char **args);
 char **redirectionParseAndSetup(char **input);
 void popenTest();
 void executeCommand(char **commands);
+int standardOutReal;
+int standardInReal;
+int status;
+
 
 void executeLine(char *input)
 {
@@ -12,10 +16,7 @@ void executeLine(char *input)
     char **commands = parse_args(input, ';');
     char **args;
     int i;
-    int status;
     int redirect;
-    int standardOutReal;
-    int standardInReal;
     for (i = 0; i < numCommands; i++)
     {
         redirect = countDelimiters(commands[i], '<') + countDelimiters(commands[i], '>') - 2;
@@ -26,7 +27,8 @@ void executeLine(char *input)
         }
         else
         {
-            if (strcmp(args[0], "cd") == 0){
+            if (strcmp(args[0], "cd") == 0)
+            {
                 cd(args);
             }
             else if (strcmp(args[0], "exit") == 0)
@@ -39,8 +41,8 @@ void executeLine(char *input)
                 standardInReal = dup(STDIN_FILENO);
                 args = redirectionParseAndSetup(args);
             }
-            // executeCommand(args);
-            execvp(args[0], args);
+            executeCommand(args);
+            // execvp(args[0], args);
             if (redirect)
             {
                 dup2(standardInReal, STDIN_FILENO);
@@ -54,16 +56,65 @@ void executeLine(char *input)
 
 void executeCommand(char **commands) //this will deal with pipings
 {
-    char *commandLine = malloc(arrayOfStringsLength(commands));
-    char **current = commands;
-    while (*current){
-        strcat(commandLine, *current);
-        current++;
+    char *commandString = "";
+    char **args;
+    int start = 0;
+    int end = 0;
+    int newStart;
+    int i;
+    int pipefd[2];
+    pipe(pipefd);
+    
+    for (i = 0; i < lengthOfArray(commands); i++)
+    {
+        if (*commands[i] == '|')
+        {
+            newStart = end + 1;
+            end--;
+            args = malloc(end - start + 1);
+            args[end - start] = NULL;
+            for (; end >= start; end--)
+            {
+                args[end - start] = commands[end];
+            }
+            start = newStart;
+            end = newStart;
+            dup2(STDOUT_FILENO, STDIN_FILENO);
+            if (fork())
+            {
+                wait(&status);
+                free(args);
+            }
+            else
+            {
+                execvp(args[0], args);
+            }
+        }
+        else
+        {
+            end++;
+        }
     }
-    popen(commandLine, "w");
+    end--;
+    args = malloc(end - start + 1);
+    args[end - start] = NULL;
+    for (; end >= start; end--)
+    {
+        args[end - start] = commands[end];
+    }
+    dup2(standardOutReal, STDOUT_FILENO);
+    if (fork())
+    {
+        wait(&status);
+        free(args);
+    }
+    else
+    {
+        execvp(args[0], args);
+    }
 }
 
-char** redirectionParseAndSetup(char **input)
+char **redirectionParseAndSetup(char **input)
 {
     char **current = input;
     int stdoutFile;
@@ -90,7 +141,9 @@ char** redirectionParseAndSetup(char **input)
         {
             current++;
             stdinFile = open(*current, O_RDONLY, 0777);
-        }else{
+        }
+        else
+        {
             newInput[i] = *current;
             i++;
         }
@@ -102,18 +155,23 @@ char** redirectionParseAndSetup(char **input)
         dup2(stdoutFile, STDOUT_FILENO);
         close(stdoutFile);
     }
-    if (stdinFile){
+    if (stdinFile)
+    {
         dup2(stdinFile, STDIN_FILENO);
         close(stdinFile);
     }
     return newInput;
 }
 
-void cd(char ** args){
+void cd(char **args)
+{
     char dir[1000];
-    if (args[1]){
+    if (args[1])
+    {
         chdir(args[1]);
-    }else{
+    }
+    else
+    {
         char *homedir = getenv("HOME");
         chdir(homedir);
     }
