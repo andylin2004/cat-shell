@@ -13,6 +13,7 @@ int status;
 int *pipefd;
 int pipeNum = 0;
 int pipes;
+char error[1000];
 
 void executeLine(char *input)
 {
@@ -45,6 +46,7 @@ void executeLine(char *input)
             }
         }
         executeCommand(args, pipes);
+        wait(&status);
         if (redirect || pipes)
         {
             dup2(standardInReal, STDIN_FILENO);
@@ -117,7 +119,6 @@ void executeCommandFork(char **commands, int start, int end)
             dup2(pipefd[pipeNum - 2], STDIN_FILENO);
         }else if (standardInTemp)
         {
-            printf("head");
             dup2(standardInTemp, STDIN_FILENO);
         }
 
@@ -127,6 +128,9 @@ void executeCommandFork(char **commands, int start, int end)
         }
 
         execvp(args[0], args);
+
+        // read(STDERR_FILENO, error, sizeof(char) * 1000);
+        // printf("Error: %s\n", error);
     }
     else
     {
