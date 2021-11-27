@@ -91,6 +91,11 @@ void executeCommandFork(char **commands, int start, int end)
 {
     char **args;
     int i;
+    for (i = 0; i < lengthOfArray(commands) && commands[i] ; i++){
+        // printf("%s is sus\n", commands[i]);
+        printf("add %d\n", commands[i]);
+        printf("add m %d\n", *commands);
+    }
     for (; end < lengthOfArray(commands) && *commands[end] != '|'; end++){
         printf("%s\n", commands[end]);
     }
@@ -109,18 +114,20 @@ void executeCommandFork(char **commands, int start, int end)
         if (pipeNum + 1 < pipes * 2)
         {
             dup2(pipefd[pipeNum + 1], STDOUT_FILENO);
-        }else if (standardOutTemp)
-        {
-            dup2(standardOutTemp, STDOUT_FILENO);
         }
+        // else if (standardOutTemp)
+        // {
+        //     dup2(standardOutTemp, STDOUT_FILENO);
+        // }
 
         if (pipeNum - 2 >= 0)
         {
             dup2(pipefd[pipeNum - 2], STDIN_FILENO);
-        }else if (standardInTemp)
-        {
-            dup2(standardInTemp, STDIN_FILENO);
         }
+        // else if (standardInTemp)
+        // {
+        //     dup2(standardInTemp, STDIN_FILENO);
+        // }
 
         for (i = 0; i < pipes * 2; i++)
         {
@@ -145,7 +152,7 @@ void executeCommandFork(char **commands, int start, int end)
 char **redirectionParseAndSetup(char **input)
 {
     char **current = input;
-    char **newInput = malloc(sizeof(input));
+    char **newInput = malloc(lengthOfArray(input) * sizeof(char *));
     int i = 0;
 
     while (*current)
@@ -184,6 +191,12 @@ char **redirectionParseAndSetup(char **input)
     {
         dup2(standardInTemp, STDIN_FILENO);
     }
+    for (i = 0; newInput[i]; i++)
+    {
+        printf("amogus %s\n", newInput[i]);
+        printf("amogus addr %d\n", newInput[i]);
+    }
+    newInput = realloc(newInput, sizeof(char *) * (i + 1));
     return newInput;
 }
 

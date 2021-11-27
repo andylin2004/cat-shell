@@ -15,6 +15,7 @@ char ** parse_args(char *code, char delim) {
         }
     }
     result[i] = NULL;
+    result = realloc(result, (i + 1) * sizeof(char *));
     return result;
 }
 
