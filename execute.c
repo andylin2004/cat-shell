@@ -26,44 +26,46 @@ void executeLine(char *input)
     int redirect;
     for (i = 0; i < numCommands; i++)
     {
-        redirect = countDelimiters(commands[i], '<') + countDelimiters(commands[i], '>') - 2;
-        pipes = countDelimiters(commands[i], '|') - 1;
-        args = parse_args(commands[i], ' ');
-        if (strcmp(args[0], "cd") == 0)
-        {
-            cd(args);
-        }
-        else if (strcmp(args[0], "exit") == 0)
-        {
-            kill(getppid(), SIGTERM); //ppid is the shell
-        }
-        if (redirect || pipes)
-        {
-            standardOutReal = dup(STDOUT_FILENO);
-            standardInReal = dup(STDIN_FILENO);
-            if (redirect)
+        if (commands[i]){
+            redirect = countDelimiters(commands[i], '<') + countDelimiters(commands[i], '>') - 2;
+            pipes = countDelimiters(commands[i], '|') - 1;
+            args = parse_args(commands[i], ' ');
+            if (strcmp(args[0], "cd") == 0)
             {
-                args = redirectionParseAndSetup(args);
+                cd(args);
+            }
+            else if (strcmp(args[0], "exit") == 0)
+            {
+                kill(getppid(), SIGTERM); //ppid is the shell
+            }
+            if (redirect || pipes)
+            {
+                standardOutReal = dup(STDOUT_FILENO);
+                standardInReal = dup(STDIN_FILENO);
+                if (redirect)
+                {
+                    args = redirectionParseAndSetup(args);
+                }
+            }
+            executeCommand(args, pipes);
+            wait(&status);
+            if (redirect || pipes)
+            {
+                dup2(standardInReal, STDIN_FILENO);
+                dup2(standardOutReal, STDOUT_FILENO);
+                close(standardInReal);
+                close(standardOutReal);
+                if (standardInTemp)
+                {
+                    close(standardInTemp);
+                }
+                if (standardOutTemp)
+                {
+                    close(standardOutTemp);
+                }
             }
         }
-        executeCommand(args, pipes);
-        wait(&status);
-        if (redirect || pipes)
-        {
-            dup2(standardInReal, STDIN_FILENO);
-            dup2(standardOutReal, STDOUT_FILENO);
-            close(standardInReal);
-            close(standardOutReal);
-            if (standardInTemp)
-            {
-                close(standardInTemp);
-            }
-            if (standardOutTemp)
-            {
-                close(standardOutTemp);
-            }
-        }
-    }
+}
 }
 
 void executeCommand(char **commands, int pipes) //this will deal with pipings
@@ -83,8 +85,6 @@ void executeCommand(char **commands, int pipes) //this will deal with pipings
     {
         close(pipefd[i]);
     }
-    // printf("ppid %d\n", getpid());
-    // lastPid = getpid();
 
     pipeNum = 0;
     lastPid = 0;
