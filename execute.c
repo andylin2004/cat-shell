@@ -14,6 +14,7 @@ int *pipefd;
 int pipeNum = 0;
 int pipes;
 char error[1000];
+int lastPid;
 
 void executeLine(char *input)
 {
@@ -74,24 +75,27 @@ void executeCommand(char **commands, int pipes) //this will deal with pipings
     {
         pipe(pipefd + i * 2);
     }
-    printf("%d pipe\n", pipes);
 
     executeCommandFork(commands, 0, 0);
-    // wait(&status);
+    waitpid(lastPid, &status, 0);
 
     for (i = 0; i < pipes * 2; i++)
     {
         close(pipefd[i]);
     }
+    // printf("ppid %d\n", getpid());
+    // lastPid = getpid();
 
     pipeNum = 0;
+    lastPid = 0;
 }
 
 void executeCommandFork(char **commands, int start, int end)
 {
     char **args;
     int i;
-    for (; end < lengthOfArray(commands) && *commands[end] != '|'; end++);
+    for (; end < lengthOfArray(commands) && *commands[end] != '|'; end++)
+        ;
     int newStart = end + 1;
     end--;
     args = malloc(end - start + 1);
@@ -118,7 +122,6 @@ void executeCommandFork(char **commands, int start, int end)
         }
 
         execvp(args[0], args);
-
         // read(STDERR_FILENO, error, sizeof(char) * 1000);
         // printf("Error: %s\n", error);
     }
@@ -128,6 +131,8 @@ void executeCommandFork(char **commands, int start, int end)
         if (pipeNum <= pipes * 2)
         {
             executeCommandFork(commands, newStart, newStart);
+        }else{
+            lastPid = getppid();
         }
     }
 }
