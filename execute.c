@@ -13,11 +13,9 @@ int *pipefd;
 int pipeNum = 0;
 int pipes;
 char error[1000];
-int lastPid;
 
 void executeLine(char *input)
 {
-    printf("pid at execute %d\n", getpid());
     input = standardizeString(input);
     int numCommands = countDelimiters(input, ';');
     char **commands = parse_args(input, ';');
@@ -38,6 +36,7 @@ void executeLine(char *input)
             else if (strcmp(args[0], "exit") == 0)
             {
                 kill(getppid(), SIGTERM); //ppid is the shell
+                exit(0); // if make is not used to run
             }
             if (redirect)
             {
@@ -63,26 +62,21 @@ void executeLine(char *input)
 
 void executeCommand(char **commands, int pipes) //this will deal with pipings
 {
-    char **args;
     pipefd = malloc(sizeof(int) * pipes);
     int i;
     for (i = 0; i < pipes; i++)
     {
         pipe(pipefd + i * 2);
     }
-    printf("recursive intro pid %d\n", getpid());
 
     executeCommandFork(commands, 0, 0, 0);
     closePipes();
 
     pipeNum = 0;
-    lastPid = 0;
 }
 
 void executeCommandFork(char **commands, int start, int end, int loopNum)
 {
-    printf("recursive %d pid %d\n", loopNum, getpid());
-    printf("recursive %d parent pid %d\n", loopNum, getppid());
     char **args;
     int i;
     int forked = fork();
@@ -91,54 +85,35 @@ void executeCommandFork(char **commands, int start, int end, int loopNum)
         ;
     int newStart = end + 1;
     end--;
-    printf("array len %d\n", end - start + 2);
     args = malloc(end - start + 2);
     args[end - start + 1] = NULL;
     for (; end >= start; end--)
     {
         args[end - start] = commands[end];
-        printf("%s meme\n", args[end - start]);
     }
-    printf("%s memepp\n", args[newStart - end]);
     if (forked == 0)
     {
-        printf("recursive %d fork pid %d\n", loopNum, getpid());
-        printf("recursive %d fork parent pid %d\n", loopNum, getppid());
         if (pipeNum - 2 >= 0)
         {
-            printf("recursive %d in %d\n", loopNum, pipeNum - 2);
             dup2(pipefd[pipeNum - 2], STDIN_FILENO);
         }
 
         if (pipeNum + 1 < pipes * 2)
         {
-            printf("recursive %d out %d\n", loopNum, pipeNum + 1);
             dup2(pipefd[pipeNum + 1], STDOUT_FILENO);
         }
 
         closePipes();
 
         execvp(args[0], args);
-        read(STDERR_FILENO, error, sizeof(char) * 1000);
-        printf("Error: %s\n", error);
         free(args);
-        exit(1);
     }
     else
     {
         pipeNum += 2;
         if (pipeNum <= pipes * 2)
         {
-            printf("recursive %d next pid %d\n", loopNum, getpid());
-            printf("recursive %d next parent pid %d\n", loopNum, getppid());
             executeCommandFork(commands, newStart, newStart, loopNum + 1);
-        }
-        else
-        {
-            printf("recursive %d end pid %d\n", loopNum, getpid());
-            printf("recursive %d end parent pid %d\n", loopNum, getppid());
-            printf("last pid %d\n", forked);
-            lastPid = forked;
         }
     }
 }
@@ -182,7 +157,7 @@ char **redirectionParseAndSetup(char **input)
     if (standardOutTemp)
     {
         dup2(standardOutTemp, STDOUT_FILENO);
-        close(standardInTemp);
+        close(standardOutTemp);
     }
     if (standardInTemp)
     {
