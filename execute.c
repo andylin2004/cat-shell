@@ -5,10 +5,9 @@ char **redirectionParseAndSetup(char **input);
 void popenTest();
 void executeCommand(char **commands, int pipes);
 void executeCommandFork(char **commands, int start, int end, int loopNum);
+void closePipes();
 int standardOutReal;
 int standardInReal;
-int standardOutTemp;
-int standardInTemp;
 int status;
 int *pipefd;
 int pipeNum = 0;
@@ -40,34 +39,23 @@ void executeLine(char *input)
             {
                 kill(getppid(), SIGTERM); //ppid is the shell
             }
-            if (redirect || pipes)
+            if (redirect)
             {
                 standardOutReal = dup(STDOUT_FILENO);
                 standardInReal = dup(STDIN_FILENO);
-                if (redirect)
-                {
-                    args = redirectionParseAndSetup(args);
-                }
+                args = redirectionParseAndSetup(args);
             }
             executeCommand(args, pipes);
             for (i = 0; i < pipes + 1; i++)
             {
                 wait(&status);
             }
-            if (redirect || pipes)
+            if (redirect)
             {
                 dup2(standardInReal, STDIN_FILENO);
                 dup2(standardOutReal, STDOUT_FILENO);
                 close(standardInReal);
                 close(standardOutReal);
-                if (standardInTemp)
-                {
-                    close(standardInTemp);
-                }
-                if (standardOutTemp)
-                {
-                    close(standardOutTemp);
-                }
             }
         }
     }
@@ -85,11 +73,7 @@ void executeCommand(char **commands, int pipes) //this will deal with pipings
     printf("recursive intro pid %d\n", getpid());
 
     executeCommandFork(commands, 0, 0, 0);
-
-    for (i = 0; i < pipes * 2; i++)
-    {
-        close(pipefd[i]);
-    }
+    closePipes();
 
     pipeNum = 0;
     lastPid = 0;
@@ -132,10 +116,7 @@ void executeCommandFork(char **commands, int start, int end, int loopNum)
             dup2(pipefd[pipeNum + 1], STDOUT_FILENO);
         }
 
-        for (i = 0; i < pipes * 2; i++)
-        {
-            close(pipefd[i]);
-        }
+        closePipes();
 
         execvp(args[0], args);
         read(STDERR_FILENO, error, sizeof(char) * 1000);
@@ -156,7 +137,7 @@ void executeCommandFork(char **commands, int start, int end, int loopNum)
         {
             printf("recursive %d end pid %d\n", loopNum, getpid());
             printf("recursive %d end parent pid %d\n", loopNum, getppid());
-            printf("last pid %d", forked);
+            printf("last pid %d\n", forked);
             lastPid = forked;
         }
     }
@@ -164,6 +145,8 @@ void executeCommandFork(char **commands, int start, int end, int loopNum)
 
 char **redirectionParseAndSetup(char **input)
 {
+    int standardOutTemp;
+    int standardInTemp;
     char **current = input;
     char **newInput = malloc(lengthOfArray(input) * sizeof(char *));
     int i = 0;
@@ -199,10 +182,12 @@ char **redirectionParseAndSetup(char **input)
     if (standardOutTemp)
     {
         dup2(standardOutTemp, STDOUT_FILENO);
+        close(standardInTemp);
     }
     if (standardInTemp)
     {
         dup2(standardInTemp, STDIN_FILENO);
+        close(standardInTemp);
     }
     newInput = realloc(newInput, sizeof(char *) * (i + 1));
     return newInput;
@@ -219,5 +204,14 @@ void cd(char **args)
     {
         char *homedir = getenv("HOME");
         chdir(homedir);
+    }
+}
+
+void closePipes()
+{
+    int i;
+    for (i = 0; i < pipes * 2; i++)
+    {
+        close(pipefd[i]);
     }
 }
