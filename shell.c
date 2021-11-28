@@ -8,7 +8,7 @@ int main() {
         int n;
         n = countDelimiters(path,'/');
         code = parse_args(path, '/');
-        printf("%s %s catsh$ ", getlogin(),code[n-2]);
+        printf("%s %s catsh$ %s", getlogin(),code[n-2], readline("test <"));
         fflush(stdout);
         char command[1000] = {0};
         read(STDIN_FILENO, command, 100);
