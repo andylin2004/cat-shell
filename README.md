@@ -14,4 +14,4 @@ Features Attempted/ Work In progress:
 
 Noted Bugs:
 - When using cd, sometimes an error gets printed out saying that it cannot find the directory, however function still works as intended.
-- Piping works optimally with one pipe. Multiple pipes will work, but will result in a buggy behavior.
+- Piping works optimally with up to two pipes. Once there are more than two pipes, shell behavior becomes buggy.
