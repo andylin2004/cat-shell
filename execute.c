@@ -170,14 +170,23 @@ char **redirectionParseAndSetup(char **input)
 
 void cd(char **args)
 {
-    char dir[1000];
+    char *homedir = getenv("HOME");
     if (args[1])
     {
-        chdir(args[1]);
+        if (args[1][0] == '~'){
+            char *dir = args[1] + 1;
+            char *completeDir = malloc((strlen(homedir) + strlen(dir)) * sizeof(char));
+            strcat(completeDir, homedir);
+            strcat(completeDir, dir);
+            chdir(completeDir);
+        }
+        else if (args[1][0] != '~')
+        {
+            chdir(args[1]);
+        }
     }
     else
     {
-        char *homedir = getenv("HOME");
         chdir(homedir);
     }
 }
