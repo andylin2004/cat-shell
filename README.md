@@ -17,4 +17,5 @@ Features Attempted/ Work In progress:
 - Using Tab in the same way as Bash
 
 Noted Bugs:
-- When using cd, sometimes an error gets printed out saying that it cannot find the directory, however function still works as intended.
+
+
