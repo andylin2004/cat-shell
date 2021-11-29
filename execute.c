@@ -22,7 +22,10 @@ void executeLine(char *input)
     char **args;
     int i;
     int redirect;
-    for (i = 0; i < numCommands; i++)
+    if (input != NULL){
+        printf("\n");
+    }else{
+        for (i = 0; i < numCommands; i++)
     {
         if (commands[i])
         {
@@ -57,6 +60,7 @@ void executeLine(char *input)
                 close(standardOutReal);
             }
         }
+    }
     }
 }
 
@@ -110,6 +114,7 @@ void executeCommandFork(char **commands, int start, int end, int loopNum)
         execvp(args[0], args);
 
         free(args);
+        free(pipefd);
     }
     else
     {
