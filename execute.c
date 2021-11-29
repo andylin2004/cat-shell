@@ -1,17 +1,6 @@
 #include "execute.h"
 #include "history.h"
 
-void cd(char **args);
-char **redirectionParseAndSetup(char **input);
-void executeCommand(char **commands, int pipes);
-void executeCommandFork(char **commands, int start, int end, int pipeNum);
-void closePipes();
-int standardOutReal;
-int standardInReal;
-int status;
-int *pipefd;
-int pipes;
-
 void executeLine(char *input)
 {
     writeCommandToHistory(input);

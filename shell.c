@@ -1,5 +1,6 @@
 #include "execute.h"
 
+//starts and maintains the shell
 int main() {
     while (1) {
         char path[1000];
