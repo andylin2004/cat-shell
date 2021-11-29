@@ -1,4 +1,5 @@
 #include "execute.h"
+#include "history.h"
 
 void cd(char **args);
 char **redirectionParseAndSetup(char **input);
@@ -13,6 +14,7 @@ int pipes;
 
 void executeLine(char *input)
 {
+    writeCommandToHistory(input);
     input = standardizeString(input);
     int numCommands = countDelimiters(input, ';');
     char **commands = parse_args(input, ';');
