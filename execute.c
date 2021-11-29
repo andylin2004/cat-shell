@@ -1,4 +1,5 @@
 #include "execute.h"
+#include "history.h"
 
 void executeLine(char *input)
 {

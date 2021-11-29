@@ -1,5 +1,4 @@
 #include "parse.h"
-#include "history.h"
 #include <signal.h>
 #include <sys/wait.h>
 
