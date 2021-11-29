@@ -1,4 +1,5 @@
 #include <sys/stat.h>
+#include <limits.h>
 #include "parse.h"
 #include "execute.h"
 

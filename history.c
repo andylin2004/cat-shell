@@ -1,7 +1,12 @@
 #include "history.h"
 
 void openHistory(){
-    historyFile = open(".catsh_history", O_RDWR | O_APPEND | O_CREAT, 0777);
+    char *homedir = getenv("HOME");
+    char catshDirectory[PATH_MAX] = {0};
+    strcat(catshDirectory, homedir);
+    strcat(catshDirectory, "/.catsh_history");
+    printf("%s\n", catshDirectory);
+    historyFile = open(catshDirectory, O_RDWR | O_APPEND | O_CREAT, 0777);
 }
 
 void writeCommandToHistory(char* command){
