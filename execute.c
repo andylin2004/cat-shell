@@ -23,6 +23,7 @@ void executeLine(char *input)
     char **commands = parse_args(input, ';');
     char **args;
     int i;
+    int j;
     int redirect;
     if (input[0] == '\0')
     {
@@ -61,7 +62,7 @@ void executeLine(char *input)
                     args = redirectionParseAndSetup(args);
                 }
                 executeCommand(args, pipes);
-                for (i = 0; i < pipes + 1; i++)
+                for (j = 0; j < pipes + 1; j++)
                 {
                     wait(&status);
                 }
