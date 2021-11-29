@@ -3,15 +3,13 @@
 void cd(char **args);
 char **redirectionParseAndSetup(char **input);
 void executeCommand(char **commands, int pipes);
-void executeCommandFork(char **commands, int start, int end, int loopNum);
+void executeCommandFork(char **commands, int start, int end, int pipeNum);
 void closePipes();
 int standardOutReal;
 int standardInReal;
 int status;
 int *pipefd;
-int pipeNum = 0;
 int pipes;
-char error[1000];
 
 void executeLine(char *input)
 {
@@ -21,46 +19,49 @@ void executeLine(char *input)
     char **args;
     int i;
     int redirect;
-    if (input[0] == '\0'){
-        printf("\n");
-    }else{
-        for (i = 0; i < numCommands; i++)
+    if (input[0] == '\0')
     {
-        if (commands[i])
+        printf("\n");
+    }
+    else
+    {
+        for (i = 0; i < numCommands; i++)
         {
-            redirect = countDelimiters(commands[i], '<') + countDelimiters(commands[i], '>') - 2;
-            pipes = countDelimiters(commands[i], '|') - 1;
-            args = parse_args(commands[i], ' ');
-            if (strcmp(args[0], "cd") == 0)
+            if (commands[i])
             {
-                cd(args);
-                return;
-            }
-            else if (strcmp(args[0], "exit") == 0)
-            {
-                kill(getppid(), SIGTERM); //ppid is the shell
-                exit(0); // if make is not used to run
-            }
-            if (redirect)
-            {
-                standardOutReal = dup(STDOUT_FILENO);
-                standardInReal = dup(STDIN_FILENO);
-                args = redirectionParseAndSetup(args);
-            }
-            executeCommand(args, pipes);
-            for (i = 0; i < pipes + 1; i++)
-            {
-                wait(&status);
-            }
-            if (redirect)
-            {
-                dup2(standardInReal, STDIN_FILENO);
-                dup2(standardOutReal, STDOUT_FILENO);
-                close(standardInReal);
-                close(standardOutReal);
+                redirect = countDelimiters(commands[i], '<') + countDelimiters(commands[i], '>') - 2;
+                pipes = countDelimiters(commands[i], '|') - 1;
+                args = parse_args(commands[i], ' ');
+                if (strcmp(args[0], "cd") == 0)
+                {
+                    cd(args);
+                    return;
+                }
+                else if (strcmp(args[0], "exit") == 0)
+                {
+                    kill(getppid(), SIGTERM); //ppid is the shell
+                    exit(0);                  // if make is not used to run
+                }
+                if (redirect)
+                {
+                    standardOutReal = dup(STDOUT_FILENO);
+                    standardInReal = dup(STDIN_FILENO);
+                    args = redirectionParseAndSetup(args);
+                }
+                executeCommand(args, pipes);
+                for (i = 0; i < pipes + 1; i++)
+                {
+                    wait(&status);
+                }
+                if (redirect)
+                {
+                    dup2(standardInReal, STDIN_FILENO);
+                    dup2(standardOutReal, STDOUT_FILENO);
+                    close(standardInReal);
+                    close(standardOutReal);
+                }
             }
         }
-    }
     }
 }
 
@@ -76,12 +77,12 @@ void executeCommand(char **commands, int pipes) //this will deal with pipings
 
     executeCommandFork(commands, 0, 0, 0);
     closePipes();
-    free(pipefd);
-
-    pipeNum = 0;
+    if (*pipefd){
+        free(pipefd);
+    }
 }
 
-void executeCommandFork(char **commands, int start, int end, int loopNum)
+void executeCommandFork(char **commands, int start, int end, int pipeNum)
 {
     char **args;
     int i;
@@ -121,7 +122,7 @@ void executeCommandFork(char **commands, int start, int end, int loopNum)
         pipeNum += 2;
         if (pipeNum <= pipes * 2)
         {
-            executeCommandFork(commands, newStart, newStart, loopNum + 1);
+            executeCommandFork(commands, newStart, newStart, pipeNum);
         }
     }
 }
@@ -181,7 +182,8 @@ void cd(char **args)
     char *homedir = getenv("HOME");
     if (args[1])
     {
-        if (args[1][0] == '~'){
+        if (args[1][0] == '~')
+        {
             char *dir = args[1] + 1;
             char *completeDir = malloc((strlen(homedir) + strlen(dir)) * sizeof(char));
             strcat(completeDir, homedir);
