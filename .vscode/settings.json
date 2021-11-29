@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "signal.h": "c",
+        "locale": "c",
+        "curses.h": "c",
+        "parse.h": "c"
+    },
+    "cSpell.ignoreWords": [
+        "catsh"
+    ]
+}
