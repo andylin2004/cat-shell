@@ -19,7 +19,6 @@ char ** parse_args(char *code, char delim) {
     return result;
 }
 
-//counts number of occurrences of a certain deliminator (which will be used in parseargs)
 int countDelimiters(char *code, char delim) {
     char *n = code;
     int num = 1;
