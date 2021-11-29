@@ -62,8 +62,9 @@ void executeLine(char *input)
 
 void executeCommand(char **commands, int pipes) //this will deal with pipings
 {
-    pipefd = malloc(sizeof(int) * pipes);
+    pipefd = malloc(pipes * sizeof(int *));
     int i;
+    int fd_max;
     for (i = 0; i < pipes; i++)
     {
         pipe(pipefd + i * 2);
@@ -71,6 +72,7 @@ void executeCommand(char **commands, int pipes) //this will deal with pipings
 
     executeCommandFork(commands, 0, 0, 0);
     closePipes();
+    free(pipefd);
 
     pipeNum = 0;
 }
@@ -106,6 +108,7 @@ void executeCommandFork(char **commands, int start, int end, int loopNum)
         closePipes();
 
         execvp(args[0], args);
+
         free(args);
     }
     else
