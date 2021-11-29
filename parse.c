@@ -6,7 +6,7 @@ char ** parse_args(char *code, char delim) {
     char ** result = malloc(num * sizeof(char *));
     int i = 0;
     char seperatorChars[2] = "\n";
-    seperatorChars[1] = delim;
+        seperatorChars[1] = delim;
     while ((current = strsep(&code, seperatorChars)))
     {
         if (*current){

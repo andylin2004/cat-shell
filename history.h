@@ -1,8 +1,8 @@
-#include <stdio.h>
-#include <fcntl.h>
-#include <string.h>
-#include <unistd.h>
+#include <sys/stat.h>
+#include "parse.h"
 
-int fileHistory;
+int historyFile;
+char **history;
 
 void writeCommandToHistory(char *command);
+void readHistory();

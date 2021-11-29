@@ -38,6 +38,9 @@ void executeLine(char *input)
                 {
                     cd(args);
                     return;
+                }else if (strcmp(args[0], "history") == 0){
+                    readHistory();
+                    return;
                 }
                 else if (strcmp(args[0], "exit") == 0)
                 {

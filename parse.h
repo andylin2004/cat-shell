@@ -3,8 +3,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
-#include <readline/readline.h>
-#include <readline/history.h>
+// #include <readline/readline.h>
+// #include <readline/history.h>
 #define SIZE 1000
 
 char ** parse_args(char *code, char delim);

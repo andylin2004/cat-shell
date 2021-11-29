@@ -11,7 +11,7 @@ execute.o: execute.c execute.h parse.h
 parse.o: parse.c parse.h
 	gcc -c parse.c
 
-history.o: history.c history.h
+history.o: history.c history.h parse.h
 	gcc -c history.c
 
 run:
