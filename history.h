@@ -6,6 +6,7 @@
 int historyFile;
 char **history;
 int historyLength;
+char catshDirectory[PATH_MAX];
 
 void writeCommandToHistory(char *command);
 void readHistory();

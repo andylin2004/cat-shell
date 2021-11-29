@@ -2,10 +2,12 @@
 
 void openHistory(){
     char *homedir = getenv("HOME");
-    char catshDirectory[PATH_MAX] = {0};
+    int i;
+    for (i = 0; i < PATH_MAX; i++){
+        catshDirectory[i] = '\0';
+    }
     strcat(catshDirectory, homedir);
     strcat(catshDirectory, "/.catsh_history");
-    printf("%s\n", catshDirectory);
     historyFile = open(catshDirectory, O_RDWR | O_APPEND | O_CREAT, 0777);
 }
 
@@ -17,7 +19,7 @@ void writeCommandToHistory(char* command){
 void readHistory(){
     openHistory();
     struct stat fileInfo;
-    stat(".catsh_history", &fileInfo);
+    stat(catshDirectory, &fileInfo);
     int fileSize = fileInfo.st_size;
     char *historyFileContents = malloc(fileSize + sizeof(char));
     read(historyFile, historyFileContents, fileSize + sizeof(char));

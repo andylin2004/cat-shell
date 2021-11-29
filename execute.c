@@ -15,6 +15,9 @@ int pipes;
 void executeLine(char *input)
 {
     writeCommandToHistory(input);
+    if (strchr(input, '\n') == NULL){
+        writeCommandToHistory("\n");
+    }
     input = standardizeString(input);
     int numCommands = countDelimiters(input, ';');
     char **commands = parse_args(input, ';');
