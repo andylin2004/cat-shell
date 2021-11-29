@@ -2,7 +2,6 @@
 
 void cd(char **args);
 char **redirectionParseAndSetup(char **input);
-void popenTest();
 void executeCommand(char **commands, int pipes);
 void executeCommandFork(char **commands, int start, int end, int loopNum);
 void closePipes();
@@ -22,7 +21,7 @@ void executeLine(char *input)
     char **args;
     int i;
     int redirect;
-    if (input != NULL){
+    if (input[0] == '\0'){
         printf("\n");
     }else{
         for (i = 0; i < numCommands; i++)
@@ -35,6 +34,7 @@ void executeLine(char *input)
             if (strcmp(args[0], "cd") == 0)
             {
                 cd(args);
+                return;
             }
             else if (strcmp(args[0], "exit") == 0)
             {
