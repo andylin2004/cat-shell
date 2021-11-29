@@ -39,7 +39,11 @@ void executeLine(char *input)
                     cd(args);
                     return;
                 }else if (strcmp(args[0], "history") == 0){
-                    readHistory();
+                    if (args[1]){
+                        runHistory(args[1]);
+                    }else{
+                        printHistory();
+                    }
                     return;
                 }
                 else if (strcmp(args[0], "exit") == 0)
