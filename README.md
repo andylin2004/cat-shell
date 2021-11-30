@@ -18,6 +18,11 @@
         ``` 
         catsh$ history 69
         ```
+        - This also works with negative numbers, in order to do the last command or a command done two entries ago.
+        eg:
+        ```
+        catsh$ history -420
+        ```
 
 ## Launch Codes
 
@@ -54,7 +59,6 @@ $ ./shell
 - Redirection behavior found on Zsh.
 
 ## Noted Bugs
-- You cannot use pipes or redirections on the same command as cd, exit, or history. (I don't expect anyone to do this anyways, unless you are a weird shell user.)
 - You cannot change directory with arguments ``` ~[username] ```. 
 - Pressing the arrow buttons will generate the ascii keys, instead of moving the cursor or going through the history.
 
@@ -77,4 +81,5 @@ int countDelimiters(char *code, char delim);
 int arrayOfStringsLength(char **array);
 char *standardizeString(char *oldString);
 int lengthOfArray(char **array);
+char * squigglyToHomeDirectory(char* string);
 ```
