@@ -29,14 +29,14 @@
 ### Cloning the Project
 Run:
 ```
-$ git clone https://github.com/andylin2004-systems/project_01.git
+$ git clone https://github.com/andylin2004/cat-shell.git
 ```
 
 ### Building the Project
 Ensure that you have gcc installed on your system.
 Run:
 ```bash
-$ cd /path/to/project_01
+$ cd /path/to/cat-shell
 $ make
 ```
 
@@ -44,12 +44,12 @@ $ make
 Run:
 
 ```bash
-$ cd /path/to/project_01
+$ cd /path/to/cat-shell
 $ make run
 ```
 Alternatively, you can also run: 
 ```bash
-$ cd /path/to/project_01
+$ cd /path/to/cat-shell
 $ ./shell
 ```
 
