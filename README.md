@@ -30,7 +30,7 @@ $ git clone https://github.com/andylin2004-systems/project_01.git
 ### Building the Project
 Ensure that you have gcc installed on your system.
 Run:
-``` 
+```bash
 $ cd /path/to/project_01
 $ make
 ```
@@ -38,12 +38,12 @@ $ make
 ### Running the Project
 Run:
 
-```
+```bash
 $ cd /path/to/project_01
 $ make run
 ```
 Alternatively, you can also run: 
-```
+```bash
 $ cd /path/to/project_01
 $ ./shell
 ```
@@ -59,7 +59,7 @@ $ ./shell
 
 ## Function Headers
 
-```
+```c
 int main();
 void executeLine(char *input);
 void cd(char **args);
