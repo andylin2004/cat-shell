@@ -1,4 +1,8 @@
 #include "parse.h"
+#ifndef HISTORY_H
+#define HISTORY_H
+#include "history.h"
+#endif
 #include <signal.h>
 #include <sys/wait.h>
 
