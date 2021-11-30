@@ -49,13 +49,14 @@ $ ./shell
 ```
 
 ## Features Attempted
-- Using Arrow Keys as a method to call previous functions and to move text field cursor between characters
-- Using Tab in the same way as Bash
+- Using Arrow Keys as a method to call previous functions and to move text field cursor between characters, as intercepting key inputs would've been too complicated for us to do.
+- Using Tab in the same way as Bash. This would involve intercepting key inputs, and we had issues with this.
 - Redirection behavior found on Zsh.
 
 ## Noted Bugs
 - You cannot use pipes or redirections on the same command as cd, exit, or history. (I don't expect anyone to do this anyways, unless you are a weird shell user.)
 - You cannot change directory with arguments ``` ~[username] ```. 
+- Pressing the arrow buttons will generate the ascii keys, instead of moving the cursor or going through the history.
 
 ## Function Headers
 
