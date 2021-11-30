@@ -86,17 +86,16 @@ int lengthOfArray(char **array){
     return total;
 }
 
-char* swigglyToHomeDirectory(char* string){
-    printf("%s\n", string);
+char* squigglyToHomeDirectory(char* string){
+    string = string + 1;
     char *dir = string + 1;
     char *homedir = getenv("HOME");
     char *completeDir;
-    printf("%d\n", *string);
     if (*string == '/')
     {
-        completeDir = malloc((strlen(homedir) + strlen(dir)) * sizeof(char));
+        completeDir = malloc((strlen(homedir) + strlen(dir - 1)) * sizeof(char));
         strcat(completeDir, homedir);
-        strcat(completeDir, dir);
+        strcat(completeDir, dir - 1);
     }else if (*string == '\0'){
         completeDir = malloc(strlen(homedir) * sizeof(char));
         strcat(completeDir, homedir);
@@ -108,6 +107,5 @@ char* swigglyToHomeDirectory(char* string){
         strcat(completeDir, "/../");
         strcat(completeDir, dir - 1);
     }
-    printf("%s\n", completeDir);
     return completeDir;
 }

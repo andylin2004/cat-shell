@@ -78,11 +78,18 @@ void executeCommandFork(char **commands, int start, int pipeNum)
         ;
     int newStart = end + 1;
     end--;
-    args = malloc(end - start + 2);
+    args = malloc((end - start + 2) * sizeof(char *));
     args[end - start + 1] = NULL;
     for (; end >= start; end--)
     {
-        args[end - start] = commands[end];
+        if (countDelimiters(commands[end], '~') - 1 == 1)
+        {
+            args[end - start] = squigglyToHomeDirectory(commands[end]);
+        }
+        else
+        {
+            args[end - start] = commands[end];
+        }
     }
     if (forked == 0)
     {
@@ -198,16 +205,7 @@ void cd(char **newDirectory)
     char *homedir = getenv("HOME");
     if (newDirectory[1])
     {
-        if (newDirectory[1][0] == '~')
-        {
-            newDirectory[1] = swigglyToHomeDirectory(&newDirectory[1][1]);
-            printf("%s\n", newDirectory[1]);
-            chdir(newDirectory[1]);
-        }
-        else if (newDirectory[1][0] != '~')
-        {
-            chdir(newDirectory[1]);
-        }
+        chdir(newDirectory[1]);
     }
     else
     {
