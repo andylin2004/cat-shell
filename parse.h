@@ -43,3 +43,4 @@ char *standardizeString(char *oldString);
  * @return int The length of the array.
  */
 int lengthOfArray(char **array);
+char * swigglyToHomeDirectory(char* string);

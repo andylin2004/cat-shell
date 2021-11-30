@@ -3,7 +3,8 @@
 void executeLine(char *input)
 {
     writeCommandToHistory(input);
-    if (strchr(input, '\n') == NULL){
+    if (strchr(input, '\n') == NULL)
+    {
         writeCommandToHistory("\n");
     }
     input = standardizeString(input);
@@ -26,23 +27,6 @@ void executeLine(char *input)
                 redirect = countDelimiters(commands[i], '<') + countDelimiters(commands[i], '>') - 2;
                 pipes = countDelimiters(commands[i], '|') - 1;
                 args = parse_args(commands[i], ' ');
-                if (strcmp(args[0], "cd") == 0)
-                {
-                    cd(args);
-                    return;
-                }else if (strcmp(args[0], "history") == 0){
-                    if (args[1]){
-                        runHistory(args[1]);
-                    }else{
-                        printHistory();
-                    }
-                    return;
-                }
-                else if (strcmp(args[0], "exit") == 0)
-                {
-                    kill(getppid(), SIGTERM); //ppid is the shell
-                    exit(0);                  // if make is not used to run
-                }
                 if (redirect)
                 {
                     standardOutReal = dup(STDOUT_FILENO);
@@ -78,7 +62,8 @@ void executeCommand(char **commands, int pipes) //this will deal with pipings
 
     executeCommandFork(commands, 0, 0);
     closePipes();
-    if (*pipefd){
+    if (*pipefd)
+    {
         free(pipefd);
     }
 }
@@ -112,10 +97,35 @@ void executeCommandFork(char **commands, int start, int pipeNum)
         }
 
         closePipes();
+        if (strcmp(args[0], "cd") == 0)
+        {
+            cd(args);
+            return;
+        }
+        else if (strcmp(args[0], "history") == 0)
+        {
+            if (args[1])
+            {
+                runHistory(args[1]);
+            }
+            else
+            {
+                printHistory();
+            }
+            return;
+        }
+        else if (strcmp(args[0], "exit") == 0)
+        {
+            kill(getppid(), SIGTERM); //ppid is the shell
+            exit(0);                  // if make is not used to run
+        }
+        else
+        {
+            status = execvp(args[0], args);
+        }
 
-        status = execvp(args[0], args);
-
-        if (status){
+        if (status)
+        {
             printf("catsh: command not found: %s\n", args[0]);
             return;
         }
@@ -190,11 +200,9 @@ void cd(char **newDirectory)
     {
         if (newDirectory[1][0] == '~')
         {
-            char *dir = newDirectory[1] + 1;
-            char *completeDir = malloc((strlen(homedir) + strlen(dir)) * sizeof(char));
-            strcat(completeDir, homedir);
-            strcat(completeDir, dir);
-            chdir(completeDir);
+            newDirectory[1] = swigglyToHomeDirectory(&newDirectory[1][1]);
+            printf("%s\n", newDirectory[1]);
+            chdir(newDirectory[1]);
         }
         else if (newDirectory[1][0] != '~')
         {
