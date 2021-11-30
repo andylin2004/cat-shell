@@ -1,13 +1,13 @@
 #include "parse.h"
 
-char ** parse_args(char *code, char delim) {
-    int num = countDelimiters(code, delim) + 1;
+char ** parse_args(char *string, char delim) {
+    int num = countDelimiters(string, delim) + 1;
     char *current;
     char ** result = malloc(num * sizeof(char *));
     int i = 0;
     char seperatorChars[2] = "\n";
         seperatorChars[1] = delim;
-    while ((current = strsep(&code, seperatorChars)))
+    while ((current = strsep(&string, seperatorChars)))
     {
         if (*current){
             result[i] = current;
@@ -19,8 +19,8 @@ char ** parse_args(char *code, char delim) {
     return result;
 }
 
-int countDelimiters(char *code, char delim) {
-    char *n = code;
+int countDelimiters(char *string, char delim) {
+    char *n = string;
     int num = 1;
     while (*n) {
         if (*n == delim) {

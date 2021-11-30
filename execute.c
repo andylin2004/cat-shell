@@ -182,22 +182,22 @@ char **redirectionParseAndSetup(char **input)
     return newInput;
 }
 
-void cd(char **args)
+void cd(char **newDirectory)
 {
     char *homedir = getenv("HOME");
-    if (args[1])
+    if (newDirectory[1])
     {
-        if (args[1][0] == '~')
+        if (newDirectory[1][0] == '~')
         {
-            char *dir = args[1] + 1;
+            char *dir = newDirectory[1] + 1;
             char *completeDir = malloc((strlen(homedir) + strlen(dir)) * sizeof(char));
             strcat(completeDir, homedir);
             strcat(completeDir, dir);
             chdir(completeDir);
         }
-        else if (args[1][0] != '~')
+        else if (newDirectory[1][0] != '~')
         {
-            chdir(args[1]);
+            chdir(newDirectory[1]);
         }
     }
     else
