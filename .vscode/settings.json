@@ -3,7 +3,8 @@
         "signal.h": "c",
         "locale": "c",
         "curses.h": "c",
-        "parse.h": "c"
+        "parse.h": "c",
+        "wait.h": "c"
     },
     "cSpell.ignoreWords": [
         "catsh"
