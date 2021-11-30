@@ -76,18 +76,19 @@ void executeCommand(char **commands, int pipes) //this will deal with pipings
         pipe(pipefd + i * 2);
     }
 
-    executeCommandFork(commands, 0, 0, 0);
+    executeCommandFork(commands, 0, 0);
     closePipes();
     if (*pipefd){
         free(pipefd);
     }
 }
 
-void executeCommandFork(char **commands, int start, int end, int pipeNum)
+void executeCommandFork(char **commands, int start, int pipeNum)
 {
     char **args;
     int i;
     int forked = fork();
+    int end = start;
     for (; end < lengthOfArray(commands) && *commands[end] != '|'; end++)
         ;
     int newStart = end + 1;
@@ -127,7 +128,7 @@ void executeCommandFork(char **commands, int start, int end, int pipeNum)
         pipeNum += 2;
         if (pipeNum <= pipes * 2 && !status)
         {
-            executeCommandFork(commands, newStart, newStart, pipeNum);
+            executeCommandFork(commands, newStart, pipeNum);
         }
     }
 }
