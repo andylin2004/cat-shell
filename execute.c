@@ -88,7 +88,6 @@ void executeCommandFork(char **commands, int start, int end, int pipeNum)
     char **args;
     int i;
     int forked = fork();
-    int memept;
     for (; end < lengthOfArray(commands) && *commands[end] != '|'; end++)
         ;
     int newStart = end + 1;
@@ -113,7 +112,12 @@ void executeCommandFork(char **commands, int start, int end, int pipeNum)
 
         closePipes();
 
-        execvp(args[0], args);
+        status = execvp(args[0], args);
+
+        if (status){
+            printf("catsh: command not found: %s\n", args[0]);
+            return;
+        }
 
         free(args);
         free(pipefd);
@@ -121,7 +125,7 @@ void executeCommandFork(char **commands, int start, int end, int pipeNum)
     else
     {
         pipeNum += 2;
-        if (pipeNum <= pipes * 2)
+        if (pipeNum <= pipes * 2 && !status)
         {
             executeCommandFork(commands, newStart, newStart, pipeNum);
         }
