@@ -43,4 +43,10 @@ char *standardizeString(char *oldString);
  * @return int The length of the array.
  */
 int lengthOfArray(char **array);
+/**
+ * @brief Replaces '~' in a string with the home directory
+ * 
+ * @param string The char* with the '~' in the string
+ * @return char* A new string with the home directory filled in
+ */
 char * squigglyToHomeDirectory(char* string);
