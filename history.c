@@ -48,8 +48,13 @@ void runHistory(char *input){
     {
         readHistory();
     }
-    if (indice >= 0 && indice <= historyLength){
+    if (indice >= 0 && indice < historyLength){
         printf("%s\n", history[indice]);
         executeLine(history[indice]);
+    }else if (indice < 0 && indice * -1 < historyLength){
+        printf("%s\n", history[historyLength - 1 + indice]);
+        executeLine(history[historyLength - 1 + indice]);
+    }else{
+        printf("Invalid history indice given. Please try again.");
     }
 }
