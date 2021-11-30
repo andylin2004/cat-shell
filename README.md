@@ -56,3 +56,24 @@ $ ./shell
 ## Noted Bugs
 - You cannot use pipes or redirections on the same command as cd, exit, or history. (I don't expect anyone to do this anyways, unless you are a weird shell user.)
 - You cannot change directory with arguments ``` ~[username] ```. 
+
+## Function Headers
+
+```
+int main();
+void executeLine(char *input);
+void cd(char **args);
+char **redirectionParseAndSetup(char **input);
+void executeCommand(char **commands, int pipes);
+void executeCommandFork(char **commands, int start, int end, int pipeNum);
+void closePipes();
+void writeCommandToHistory(char *command);
+void readHistory();
+void printHistory();
+void runHistory(char* input);
+char ** parse_args(char *code, char delim);
+int countDelimiters(char *code, char delim);
+int arrayOfStringsLength(char **array);
+char *standardizeString(char *oldString);
+int lengthOfArray(char **array);
+```
