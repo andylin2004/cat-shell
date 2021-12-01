@@ -27,6 +27,11 @@ void executeLine(char *input)
                 redirect = countDelimiters(commands[i], '<') + countDelimiters(commands[i], '>') - 2;
                 pipes = countDelimiters(commands[i], '|') - 1;
                 args = parse_args(commands[i], ' ');
+                if (strcmp(args[0], "exit") == 0)
+                {
+                    exit(0);
+                    kill(getppid(), SIGTERM);
+                }
                 if (redirect)
                 {
                     standardOutReal = dup(STDOUT_FILENO);
@@ -120,11 +125,6 @@ void executeCommandFork(char **commands, int start, int pipeNum)
                 printHistory();
             }
             return;
-        }
-        else if (strcmp(args[0], "exit") == 0)
-        {
-            kill(getppid(), SIGTERM); //ppid is the shell
-            exit(0);                  // if make is not used to run
         }
         else
         {
