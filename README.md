@@ -59,7 +59,6 @@ $ ./shell
 - Redirection behavior found on Zsh.
 
 ## Noted Bugs
-- You cannot change directory with arguments ``` ~[username] ```. 
 - Pressing the arrow buttons will generate the ascii keys, instead of moving the cursor or going through the history.
 
 ## Function Headers
