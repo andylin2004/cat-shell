@@ -30,7 +30,6 @@ void executeLine(char *input)
                 if (strcmp(args[0], "exit") == 0)
                 {
                     exit(0);
-                    kill(getppid(), SIGTERM);
                 }
                 if (redirect)
                 {
@@ -112,7 +111,7 @@ void executeCommandFork(char **commands, int start, int pipeNum)
         if (strcmp(args[0], "cd") == 0)
         {
             cd(args);
-            return;
+            exit(1);
         }
         else if (strcmp(args[0], "history") == 0)
         {
