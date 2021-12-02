@@ -60,7 +60,7 @@ $ ./shell
 
 ## Noted Bugs
 - Pressing the arrow buttons will generate the ascii keys, instead of moving the cursor or going through the history.
-- The exit command, if not in the directory the project is in, will exit out to the previous directory.
+- If there is a \ in front of a space, the space will not be cancelled out.
 
 ## Function Headers
 
